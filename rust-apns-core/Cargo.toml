@@ -1,5 +1,5 @@
 [package]
-name = "a2"
+name = "rust-apns-core"
 version = "0.8.0"
 authors = [
   "Matt Jarjoura <jarjoura@outlook.com>",

@@ -1,2 +1,2 @@
 [workspace]
-members = ["core", "apns", "cli"]
+members = ["rust-apns-core", "rust-apns", "rust-apns-cli"]
