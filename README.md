@@ -1,4 +1,4 @@
-# a2
+# rust-apns
 
 [![CI Status](https://github.com/walletconnect/a2/actions/workflows/ci.yml/badge.svg)](https://github.com/walletconnect/a2/actions/workflows/ci.yml)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
@@ -50,7 +50,9 @@ We've been pushing some millions of notifications daily through this library and
 are quite happy with it. Some things to know, if you're evaluating the library
 for production use:
 
-* Do not open new connections for every request. Apple will treat it as Denial of Service attack and block the sending IP address. When using the same `Client` for multiple requests, the `Client` keeps the connection alive if pushing steady traffic through it.
+* Do not open new connections for every request. Apple will treat it as Denial of Service attack
+  and block the sending IP address. When using the same `Client` for multiple requests, the
+  `Client` keeps the connection alive if pushing steady traffic through it.
 
 * For one app, one connection is quite enough already for certain kind of
   loads. With http2 protocol, the events are asynchronous and the pipeline can

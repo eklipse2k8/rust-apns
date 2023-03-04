@@ -1,5 +1,5 @@
 use crate::error::Error;
-use base64::encode;
+use base64::{engine::general_purpose, Engine as _};
 use std::io::Read;
 use std::sync::Arc;
 use std::{
@@ -153,6 +153,11 @@ impl Signer {
         Ok(f(&signature.key))
     }
 
+    #[inline]
+    fn encode<T: AsRef<[u8]>>(input: T) -> String {
+        general_purpose::STANDARD.encode(input)
+    }
+
     fn create_signature(secret: &Secret, key_id: &str, team_id: &str, issued_at: i64) -> Result<String, Error> {
         let headers = JwtHeader {
             alg: JwtAlg::ES256,
@@ -164,13 +169,13 @@ impl Signer {
             iat: issued_at,
         };
 
-        let encoded_header = encode(serde_json::to_string(&headers)?);
-        let encoded_payload = encode(serde_json::to_string(&payload)?);
+        let encoded_header = Signer::encode(serde_json::to_string(&headers)?);
+        let encoded_payload = Signer::encode(serde_json::to_string(&payload)?);
         let signing_input = format!("{}.{}", encoded_header, encoded_payload);
 
         let signature_payload = secret.sign(&signing_input)?;
 
-        Ok(format!("{}.{}", signing_input, encode(signature_payload)))
+        Ok(format!("{}.{}", signing_input, Signer::encode(signature_payload)))
     }
 
     fn renew(&self) -> Result<(), Error> {

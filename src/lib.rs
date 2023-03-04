@@ -1,6 +1,6 @@
-//! # A2
+//! # rust-apns
 //!
-//! A2 is an asynchronous client to Apple push notification service. It
+//! rust-apns is an asynchronous client to Apple push notification service. It
 //! provides a type-safe way to generate correct requests, mapping responses into
 //! corresponding types. The client supports both, certificate and token based
 //! authentication.
