@@ -3,7 +3,7 @@ mod apple;
 mod options;
 mod web;
 
-pub use self::apple::{AlertNotification, DataNotification, PushNotification};
+pub use self::apple::{AlertNotification, AlertNotificationBuilder, DataNotification, PushNotification};
 pub use self::options::{CollapseId, NotificationOptions, Priority};
 pub use self::web::{WebNotificationBuilder, WebPushAlert};
 

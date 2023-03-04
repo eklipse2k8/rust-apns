@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use anyhow::{anyhow, Result};
-use apple_apns::{Endpoint, InterruptionLevel, Priority, PushType};
+use rust_apns::{Endpoint, InterruptionLevel, Priority, PushType};
 use clap::{ArgGroup, Parser};
 use humantime::parse_duration;
 use time::{format_description::well_known::Iso8601, OffsetDateTime};

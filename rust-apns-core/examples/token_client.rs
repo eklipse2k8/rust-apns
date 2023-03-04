@@ -2,7 +2,9 @@ use argparse::{ArgumentParser, Store, StoreOption, StoreTrue};
 use std::fs::File;
 use tokio;
 
-use a2::{Client, DefaultNotificationBuilder, Endpoint, NotificationBuilder, NotificationOptions};
+use rust_apns_core::{
+    request::notification::AlertNotificationBuilder, Client, Endpoint, NotificationBuilder, NotificationOptions,
+};
 
 // An example client connectiong to APNs with a JWT token
 #[tokio::main]
@@ -54,6 +56,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         apns_topic: topic.as_deref(),
         ..Default::default()
     };
+
+    let alert = AlertNotificationBuilder::default().build();
 
     // Notification payload
     let builder = DefaultNotificationBuilder::new()

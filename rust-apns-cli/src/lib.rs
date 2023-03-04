@@ -1,7 +1,7 @@
 use std::fs;
 
 use anyhow::Result;
-use apple_apns::{
+use rust_apns::{
     Alert, Authentication, CertificateAuthority, ClientBuilder, InterruptionLevel, Request, Sound,
 };
 use clap::Parser;

@@ -44,43 +44,43 @@ pub enum PushNotification {
     Alert(AlertNotification),
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "kebab-case")]
-struct APS {
-    alert: Option<APSAlert<'a>>,
-    badge: Option<u32>,
-    sound: Option<String>,
-    content_available: bool,
-    mutable_content: bool,
-}
+// #[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+// #[serde(rename_all = "kebab-case")]
+// struct APS {
+//     alert: Option<APSAlert<'a>>,
+//     badge: Option<u32>,
+//     sound: Option<String>,
+//     content_available: bool,
+//     mutable_content: bool,
+// }
 
-impl<'a> Into<Payload<'a>> for PushNotification {
-    fn into(self) -> Payload<'a> {
-        match self {
-            PushNotification::Data(silent) => Payload {
-                topic: Some(APNS_TOPIC.to_string()),
-                content_available: true,
-                priority: apple_apns::Priority::ConsiderPower,
-                user_info: Some(silent.0),
-                ..Default::default()
-            },
-            PushNotification::Alert(alert) => Payload {
-                topic: Some(APNS_TOPIC.to_string()),
-                content_available: false,
-                priority: apple_apns::Priority::ConsiderPower,
-                alert: Some(apple_apns::Alert {
-                    title: Some(alert.title),
-                    body: Some(alert.body),
-                    ..Default::default()
-                }),
-                sound: alert.sound.map(|s| apple_apns::Sound {
-                    name: s,
-                    ..Default::default()
-                }),
-                badge: alert.badge,
-                user_info: None,
-                ..Default::default()
-            },
-        }
-    }
-}
+// impl<'a> Into<Payload<'a>> for PushNotification {
+//     fn into(self) -> Payload<'a> {
+//         match self {
+//             PushNotification::Data(silent) => Payload {
+//                 topic: Some(APNS_TOPIC.to_string()),
+//                 content_available: true,
+//                 priority: apple_apns::Priority::ConsiderPower,
+//                 user_info: Some(silent.0),
+//                 ..Default::default()
+//             },
+//             PushNotification::Alert(alert) => Payload {
+//                 topic: Some(APNS_TOPIC.to_string()),
+//                 content_available: false,
+//                 priority: apple_apns::Priority::ConsiderPower,
+//                 alert: Some(apple_apns::Alert {
+//                     title: Some(alert.title),
+//                     body: Some(alert.body),
+//                     ..Default::default()
+//                 }),
+//                 sound: alert.sound.map(|s| apple_apns::Sound {
+//                     name: s,
+//                     ..Default::default()
+//                 }),
+//                 badge: alert.badge,
+//                 user_info: None,
+//                 ..Default::default()
+//             },
+//         }
+//     }
+// }

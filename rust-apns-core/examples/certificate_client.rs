@@ -1,5 +1,5 @@
-use a2::{Client, DefaultNotificationBuilder, NotificationBuilder, NotificationOptions};
 use argparse::{ArgumentParser, Store, StoreOption, StoreTrue};
+use rust_apns_core::{request::notification::AlertNotificationBuilder, Client, Endpoint, NotificationOptions};
 use tokio;
 
 // An example client connectiong to APNs with a certificate and key
@@ -38,9 +38,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         {
             // Which service to call, test or production?
             let endpoint = if sandbox {
-                a2::Endpoint::Sandbox
+                Endpoint::Sandbox
             } else {
-                a2::Endpoint::Production
+                Endpoint::Production
             };
 
             let mut certificate = std::fs::File::open(certificate_file)?;
@@ -59,10 +59,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     };
 
     // Notification payload
-    let builder = DefaultNotificationBuilder::new()
-        .set_body(message.as_ref())
-        .set_sound("default")
-        .set_badge(1u32);
+    let builder = AlertNotificationBuilder::default()
+        .body(message.as_ref())
+        .sound("default")
+        .badge(1u32)
+        .build()?;
 
     let payload = builder.build(device_token.as_ref(), options);
     let response = client.send(payload).await?;
