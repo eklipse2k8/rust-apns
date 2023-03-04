@@ -1,9 +1,9 @@
 ///! The `aps` notification content builders
-mod default;
+mod apple;
 mod options;
 mod web;
 
-pub use self::default::{DefaultAlert, DefaultNotificationBuilder};
+pub use self::apple::{AlertNotification, DataNotification, PushNotification};
 pub use self::options::{CollapseId, NotificationOptions, Priority};
 pub use self::web::{WebNotificationBuilder, WebPushAlert};
 
