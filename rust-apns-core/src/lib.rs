@@ -116,6 +116,7 @@ extern crate serde;
 #[macro_use]
 extern crate serde_json;
 
+pub mod apns;
 pub mod client;
 pub mod error;
 pub mod request;

@@ -3,9 +3,7 @@ use serde::Serialize;
 use time::OffsetDateTime;
 use uuid::Uuid;
 
-use crate::header::*;
-use crate::payload::*;
-use crate::result::{Error, Result};
+use super::{header::*, payload::{Payload, Aps}, Alert, Error, InterruptionLevel, Priority, PushType, Result, Sound};
 
 /// Apple Push Notification service request options.
 #[derive(Clone, Debug, Default, PartialEq)]
@@ -148,10 +146,7 @@ where
     fn try_from(this: Request<T>) -> Result<Self> {
         let mut headers = HeaderMap::new();
 
-        headers.insert(
-            header::CONTENT_TYPE,
-            HeaderValue::from_static("application/json"),
-        );
+        headers.insert(header::CONTENT_TYPE, HeaderValue::from_static("application/json"));
 
         let _ = headers.insert(APNS_PUSH_TYPE.clone(), this.push_type.into());
 
@@ -185,11 +180,7 @@ where
             .map(|il| *il == InterruptionLevel::Critical)
             .unwrap_or_default();
 
-        let is_critical_sound = this
-            .sound
-            .as_ref()
-            .map(|sound| sound.critical)
-            .unwrap_or_default();
+        let is_critical_sound = this.sound.as_ref().map(|sound| sound.critical).unwrap_or_default();
 
         if is_critical != is_critical_sound {
             return Err(Error::CriticalSound);

@@ -1,4 +1,4 @@
-use crate::reason::Reason;
+use super::Reason;
 
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
@@ -21,12 +21,6 @@ pub enum Error {
 
     #[error("payload too large: {size} exceeds {limit}")]
     PayloadTooLarge { size: usize, limit: usize },
-
-    #[error(transparent)]
-    Reqwest(#[from] reqwest::Error),
-
-    #[error(transparent)]
-    ReqwestMiddleware(#[from] reqwest_middleware::Error),
 
     #[error(transparent)]
     SerdeJson(#[from] serde_json::Error),
