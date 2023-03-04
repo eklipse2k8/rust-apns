@@ -1,2 +1,2 @@
 [workspace]
-members = ["apple-apns", "apple-apns-cli"]
+members = ["core", "apns", "cli"]
