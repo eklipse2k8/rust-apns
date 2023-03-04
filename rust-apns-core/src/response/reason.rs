@@ -1,7 +1,7 @@
 use http::StatusCode;
 use serde::{Deserialize, Serialize};
 use serde_with::{serde_as, skip_serializing_none, TimestampMilliSeconds};
-use time::OffsetDateTime;
+use std::time::SystemTime;
 
 /// APNS error response reason JSON body.
 #[serde_as]
@@ -57,7 +57,7 @@ pub enum Reason {
         /// was no longer valid for the topic. This key is included only when the
         /// error in the `:status` field is 410.
         #[serde_as(as = "Option<TimestampMilliSeconds>")]
-        timestamp: Option<OffsetDateTime>,
+        timestamp: Option<SystemTime>,
     },
 
     #[error("The client certificate is for the wrong environment.")]
@@ -66,7 +66,7 @@ pub enum Reason {
         /// was no longer valid for the topic. This key is included only when the
         /// error in the `:status` field is 410.
         #[serde_as(as = "Option<TimestampMilliSeconds>")]
-        timestamp: Option<OffsetDateTime>,
+        timestamp: Option<SystemTime>,
     },
 
     #[error("The provider token is stale and a new token should be generated.")]

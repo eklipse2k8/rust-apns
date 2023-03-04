@@ -116,20 +116,11 @@ extern crate serde;
 #[macro_use]
 extern crate serde_json;
 
-pub mod apns;
 pub mod client;
 pub mod error;
+pub mod notification;
 pub mod request;
 pub mod response;
-mod signer;
-
-pub use crate::request::notification::{
-    CollapseId, NotificationBuilder, NotificationOptions, Priority, WebNotificationBuilder,
-    WebPushAlert,
-};
-
-pub use crate::response::{ErrorBody, ErrorReason, Response};
-
-pub use crate::client::{Client, Endpoint};
 
 pub use crate::error::Error;
+// pub use crate::response::{ErrorBody, ErrorReason, Response};

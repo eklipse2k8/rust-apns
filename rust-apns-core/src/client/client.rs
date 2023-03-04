@@ -10,32 +10,14 @@ use std::time::Duration;
 use crate::{
     error::Error::{self, ResponseError},
     request::payload::Payload,
-    response::Response,
-    signer::Signer,
+    response::response::Response,
 };
+
+use super::{signer::Signer, endpoint::Endpoint};
 
 /// Default user agent.
 pub const USER_AGENT: &str = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"));
 
-/// The APNs service endpoint to connect.
-#[derive(Debug, Clone)]
-pub enum Endpoint {
-    /// The production environment (api.push.apple.com)
-    Production,
-    /// The development/test environment (api.development.push.apple.com)
-    Sandbox,
-}
-
-impl fmt::Display for Endpoint {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let host = match self {
-            Endpoint::Production => "api.push.apple.com",
-            Endpoint::Sandbox => "api.development.push.apple.com",
-        };
-
-        write!(f, "{}", host)
-    }
-}
 
 /// Handles requests to and responses from Apple Push Notification service.
 /// Connects using a given connector. Handles the needed authentication and
@@ -101,41 +83,41 @@ impl Client {
         Ok(Self::new(connector, Some(signer), endpoint))
     }
 
-    /// Send a notification payload.
-    ///
-    /// See [ErrorReason](enum.ErrorReason.html) for possible errors.
-    #[cfg_attr(feature = "tracing", ::tracing::instrument)]
-    pub async fn send(&self, payload: Payload<'_>) -> Result<Response, Error> {
-        let request = self.build_request(payload);
-        let requesting = self.http_client.request(request);
+    // /// Send a notification payload.
+    // ///
+    // /// See [ErrorReason](enum.ErrorReason.html) for possible errors.
+    // #[cfg_attr(feature = "tracing", ::tracing::instrument)]
+    // pub async fn send(&self, payload: Payload<'_>) -> Result<Response, Error> {
+    //     let request = self.build_request(payload);
+    //     let requesting = self.http_client.request(request);
 
-        let response = requesting.await?;
+    //     let response = requesting.await?;
 
-        let apns_id = response
-            .headers()
-            .get("apns-id")
-            .and_then(|s| s.to_str().ok())
-            .map(String::from);
+    //     let apns_id = response
+    //         .headers()
+    //         .get("apns-id")
+    //         .and_then(|s| s.to_str().ok())
+    //         .map(String::from);
 
-        match response.status() {
-            StatusCode::OK => Ok(Response {
-                apns_id,
-                error: None,
-                code: response.status().as_u16(),
-            }),
-            status => {
-                let body = hyper::body::to_bytes(response).await?;
+    //     match response.status() {
+    //         StatusCode::OK => Ok(Response {
+    //             apns_id,
+    //             error: None,
+    //             code: response.status().as_u16(),
+    //         }),
+    //         status => {
+    //             let body = hyper::body::to_bytes(response).await?;
 
-                Err(ResponseError(Response {
-                    apns_id,
-                    error: serde_json::from_slice(&body).ok(),
-                    code: status.as_u16(),
-                }))
-            }
-        }
-    }
+    //             Err(ResponseError(Response {
+    //                 apns_id,
+    //                 error: serde_json::from_slice(&body).ok(),
+    //                 code: status.as_u16(),
+    //             }))
+    //         }
+    //     }
+    // }
 
-    // /// Sends a push notification and returns the APNS ID.
+    // // /// Sends a push notification and returns the APNS ID.
     // pub async fn post<T>(&self, request: Request<T>) -> Result<Uuid>
     // where
     //     T: Serialize,
@@ -184,54 +166,53 @@ impl Client {
     //     }
     // }
 
-    fn build_request(&self, payload: Payload<'_>) -> hyper::Request<Body> {
-        let path = format!("https://{}/3/device/{}", self.endpoint, payload.device_token);
+    // fn build_request(&self, payload: Payload<'_>) -> hyper::Request<Body> {
+    //     let path = self.endpoint.as_url().join(payload.device_token)?;
 
-        let mut builder = hyper::Request::builder()
-            .uri(&path)
-            .method("POST")
-            .header(CONTENT_TYPE, "application/json");
+    //     let mut builder = hyper::Request::builder()
+    //         .uri(&path)
+    //         .method("POST")
+    //         .header(CONTENT_TYPE, "application/json");
 
-        if let Some(ref apns_priority) = payload.options.apns_priority {
-            builder = builder.header("apns-priority", apns_priority.to_string().as_bytes());
-        }
-        if let Some(apns_id) = payload.options.apns_id {
-            builder = builder.header("apns-id", apns_id.as_bytes());
-        }
-        if let Some(ref apns_expiration) = payload.options.apns_expiration {
-            builder = builder.header("apns-expiration", apns_expiration.to_string().as_bytes());
-        }
-        if let Some(ref apns_collapse_id) = payload.options.apns_collapse_id {
-            builder = builder.header("apns-collapse-id", apns_collapse_id.value.as_bytes());
-        }
-        if let Some(apns_topic) = payload.options.apns_topic {
-            builder = builder.header("apns-topic", apns_topic.as_bytes());
-        }
-        if let Some(ref signer) = self.signer {
-            let auth = signer
-                .with_signature(|signature| format!("Bearer {}", signature))
-                .unwrap();
+    //     if let Some(ref apns_priority) = payload.options.apns_priority {
+    //         builder = builder.header("apns-priority", apns_priority.to_string().as_bytes());
+    //     }
+    //     if let Some(apns_id) = payload.options.apns_id {
+    //         builder = builder.header("apns-id", apns_id.as_bytes());
+    //     }
+    //     if let Some(ref apns_expiration) = payload.options.apns_expiration {
+    //         builder = builder.header("apns-expiration", apns_expiration.to_string().as_bytes());
+    //     }
+    //     if let Some(ref apns_collapse_id) = payload.options.apns_collapse_id {
+    //         builder = builder.header("apns-collapse-id", apns_collapse_id.value.as_bytes());
+    //     }
+    //     if let Some(apns_topic) = payload.options.apns_topic {
+    //         builder = builder.header("apns-topic", apns_topic.as_bytes());
+    //     }
+    //     if let Some(ref signer) = self.signer {
+    //         let auth = signer
+    //             .with_signature(|signature| format!("Bearer {}", signature))
+    //             .unwrap();
 
-            builder = builder.header(AUTHORIZATION, auth.as_bytes());
-        }
+    //         builder = builder.header(AUTHORIZATION, auth.as_bytes());
+    //     }
 
-        let payload_json = payload.to_json_string().unwrap();
-        builder = builder.header(CONTENT_LENGTH, format!("{}", payload_json.len()).as_bytes());
+    //     let payload_json = payload.to_json_string().unwrap();
+    //     builder = builder.header(CONTENT_LENGTH, format!("{}", payload_json.len()).as_bytes());
 
-        let request_body = Body::from(payload_json);
-        builder.body(request_body).unwrap()
-    }
+    //     let request_body = Body::from(payload_json);
+    //     builder.body(request_body).unwrap()
+    // }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::request::notification::AlertNotification;
-    use crate::request::notification::{CollapseId, NotificationOptions, Priority};
-    use crate::signer::Signer;
-    use http::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE};
-    use hyper::Method;
-    use hyper_alpn::AlpnConnector;
+    // use crate::request::notification::AlertNotification;
+    // use crate::request::notification::{CollapseId, NotificationOptions, Priority};
+    // use http::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE};
+    // use hyper::Method;
+    // use hyper_alpn::AlpnConnector;
 
     const PRIVATE_KEY: &'static str = "-----BEGIN PRIVATE KEY-----
 MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg8g/n6j9roKvnUkwu

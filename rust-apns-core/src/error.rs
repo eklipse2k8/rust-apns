@@ -1,5 +1,6 @@
 ///! Error and result module
-use crate::{response::Response, signer::SignerError};
+use crate::{client::signer::SignerError, response::response::Response};
+use derive_builder::UninitializedFieldError;
 use std::io;
 use thiserror::Error;
 
@@ -42,11 +43,20 @@ pub enum Error {
     #[cfg(all(not(feature = "openssl"), feature = "ring"))]
     #[error("Unexpected private key: {0}")]
     UnexpectedKey(#[from] ring::error::KeyRejected),
+
+    #[error("missing required field: {0}")]
+    BuilderMissingField(String),
 }
 
 #[cfg(feature = "openssl")]
 impl From<openssl::error::ErrorStack> for Error {
     fn from(e: openssl::error::ErrorStack) -> Self {
         Self::SignerError(SignerError::OpenSSL(e))
+    }
+}
+
+impl From<UninitializedFieldError> for Error {
+    fn from(err: UninitializedFieldError) -> Self {
+        Self::BuilderMissingField(err.field_name().to_string())
     }
 }

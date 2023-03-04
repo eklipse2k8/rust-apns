@@ -1,4 +1,4 @@
-use super::Reason;
+use super::reason::Reason;
 
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
