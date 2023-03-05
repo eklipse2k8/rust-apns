@@ -1,9 +1,12 @@
 use argparse::{ArgumentParser, Store, StoreOption, StoreTrue};
 use std::fs::File;
 use tokio;
+use uuid::Uuid;
 
 use rust_apns_core::{
-    request::notification::AlertNotificationBuilder, Client, Endpoint, NotificationBuilder, NotificationOptions,
+    client::{client::Client, Endpoint},
+    notification::AlertNotificationBuilder,
+    notification::PushNotification,
 };
 
 // An example client connectiong to APNs with a JWT token
@@ -44,7 +47,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 
     // Which service to call, test or production?
     let endpoint = if sandbox {
-        Endpoint::Sandbox
+        Endpoint::Development
     } else {
         Endpoint::Production
     };
@@ -52,20 +55,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     // Connecting to APNs
     let client = Client::token(&mut private_key, key_id, team_id, endpoint).unwrap();
 
-    let options = NotificationOptions {
-        apns_topic: topic.as_deref(),
-        ..Default::default()
-    };
-
-    let alert = AlertNotificationBuilder::default().build();
-
     // Notification payload
-    let builder = DefaultNotificationBuilder::new()
-        .set_body(message.as_ref())
-        .set_sound("default")
-        .set_badge(1u32);
+    let alert = PushNotification::Alert(
+        AlertNotificationBuilder::default()
+            .body(message)
+            .sound("default")
+            .badge(1u32)
+            .build()
+            .unwrap(),
+    );
 
-    let payload = builder.build(device_token.as_ref(), options);
+    let payload = alert.build_request(topic, None, device_token, Uuid::new_v4()).unwrap();
     let response = client.send(payload).await?;
 
     println!("Sent: {:?}", response);

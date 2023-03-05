@@ -1,6 +1,12 @@
 use argparse::{ArgumentParser, Store, StoreOption, StoreTrue};
-use rust_apns_core::{request::notification::AlertNotificationBuilder, Client, Endpoint, NotificationOptions};
 use tokio;
+use uuid::Uuid;
+
+use rust_apns_core::{
+    client::{client::Client, Endpoint},
+    notification::AlertNotificationBuilder,
+    notification::PushNotification,
+};
 
 // An example client connectiong to APNs with a certificate and key
 #[tokio::main]
@@ -38,7 +44,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         {
             // Which service to call, test or production?
             let endpoint = if sandbox {
-                Endpoint::Sandbox
+                Endpoint::Development
             } else {
                 Endpoint::Production
             };
@@ -53,19 +59,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     };
     let client = new_client()?;
 
-    let options = NotificationOptions {
-        apns_topic: topic.as_deref(),
-        ..Default::default()
-    };
-
     // Notification payload
-    let builder = AlertNotificationBuilder::default()
-        .body(message.as_ref())
-        .sound("default")
-        .badge(1u32)
-        .build()?;
+    let alert = PushNotification::Alert(
+        AlertNotificationBuilder::default()
+            .body(message)
+            .sound("default")
+            .badge(1u32)
+            .build()
+            .unwrap(),
+    );
 
-    let payload = builder.build(device_token.as_ref(), options);
+    let payload = alert.build_request(topic, None, device_token, Uuid::new_v4()).unwrap();
     let response = client.send(payload).await?;
 
     println!("Sent: {:?}", response);
