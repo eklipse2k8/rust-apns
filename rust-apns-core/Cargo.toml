@@ -8,11 +8,11 @@ authors = [
   "Sergey Tkachenko <seriy.tkachenko@gmail.com>",
 ]
 license = "MIT"
-readme  = "README.md"
+readme = "README.md"
 description = "A native, asynchronous Apple push notification client"
-keywords    = ["apns", "apple", "push", "async", "http2"]
-repository  = "https://github.com/eklipse2k8/rust-apns.git"
-homepage    = "https://github.com/eklipse2k8/rust-apns"
+keywords = ["apns", "apple", "push", "async", "http2"]
+repository = "https://github.com/eklipse2k8/rust-apns.git"
+homepage = "https://github.com/eklipse2k8/rust-apns"
 documentation = "https://docs.rs/rust-apns"
 edition = "2021"
 
@@ -23,13 +23,16 @@ ring = ["dep:ring", "pem"]
 deadpool = ["dep:deadpool"]
 
 [dependencies]
-async-trait = {version = "0" }
+async-trait = { version = "0" }
 base64 = "0"
-deadpool = {version = "0", optional = true}
-derive_builder = {version = "0" }
+deadpool = { version = "0", optional = true }
+derive_builder = { version = "0" }
 erased-serde = "0"
 http = "0"
-hyper = { version = "0", default-features = false, features = ["client", "http2"] }
+hyper = { version = "0", default-features = false, features = [
+  "client",
+  "http2",
+] }
 hyper-alpn = { git = "https://github.com/WalletConnect/hyper-alpn", ref = "0030fd0" }
 once_cell = "1.17.1"
 openssl = { version = "0", optional = true }
@@ -44,7 +47,7 @@ thiserror = "1"
 time = { version = "0.3.20", features = ["parsing"] }
 tracing = { version = "0", optional = true }
 url = { version = "2.3.1", features = ["serde"] }
-uuid = { version = "1.3.0", features = ["serde"] }
+uuid = { version = "1.3.0", features = ["serde", "v4"] }
 
 [dev-dependencies]
 argparse = "0"

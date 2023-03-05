@@ -5,10 +5,10 @@ use serde::{Deserialize, Serialize};
 use url::Url;
 
 static PRODUCTION_SERVER: Lazy<Url> =
-    Lazy::new(|| Url::parse("https://api.push.apple.com./3/device/").unwrap());
+    Lazy::new(|| Url::parse("https://api.push.apple.com/3/device/").unwrap());
 
 static DEVELOPMENT_SERVER: Lazy<Url> =
-    Lazy::new(|| Url::parse("https://api.sandbox.push.apple.com./3/device/").unwrap());
+    Lazy::new(|| Url::parse("https://api.sandbox.push.apple.com/3/device/").unwrap());
 
 /// Apple Push Notification service endpoint.
 #[derive(Clone, PartialEq, Eq, Hash)]
